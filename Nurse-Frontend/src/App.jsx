@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+// ✅ Import all nurse pages
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import ViewAppointments from "./pages/ViewAppointments";
+import EmergencyCases from "./pages/EmergencyCases";
+import AddMedicalDataForAppoiments from "./pages/AddMedicalDataForAppoiments";
+import AddMedicalDataForEmermacy from "./pages/AddMedicalDataForEmermacy";
 
+// ✅ App Router Component
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        {/* 🔹 Default route (Login) */}
+        <Route path="/" element={<Login />} />
 
-export default App
+        {/* 🔹 Dashboard after login */}
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* 🔹 View all appointments (fetched from /get_all_appointments) */}
+        <Route path="/view-appointments" element={<ViewAppointments />} />
+
+        {/* 🔹 View all emergencies (fetched from /get_all_emergencies) */}
+        <Route path="/emergency-cases" element={<EmergencyCases />} />
+
+        {/* 🔹 Fill medical data for appointments */}
+        <Route
+          path="/add-appointment-data"
+          element={<AddMedicalDataForAppoiments />}
+        />
+
+        {/* 🔹 Fill medical data for emergency cases */}
+        <Route
+          path="/add-emergency-data"
+          element={<AddMedicalDataForEmermacy />}
+        />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;

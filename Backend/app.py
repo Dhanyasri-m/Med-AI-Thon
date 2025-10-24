@@ -42,7 +42,15 @@ class Appointment(db.Model):
     state = db.Column(db.String(50))
     address = db.Column(db.String(200))
     reason = db.Column(db.String(250))
+    # 🩺 Nurse Medical Fields
+    blood_pressure = db.Column(db.String(20))
+    pulse_rate = db.Column(db.String(20))
+    weight = db.Column(db.String(20))
+    height = db.Column(db.String(20))
+    temperature = db.Column(db.String(20))
+    respiratory_rate = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 # ✅ Emergency Case Table
 class EmergencyCase(db.Model):
@@ -60,7 +68,15 @@ class EmergencyCase(db.Model):
     emergency_type = db.Column(db.String(100))
     other_contact = db.Column(db.String(15))
     immediate_treatment = db.Column(db.String(200))
+    # 🩺 Nurse Medical Fields
+    blood_pressure = db.Column(db.String(20))
+    pulse_rate = db.Column(db.String(20))
+    weight = db.Column(db.String(20))
+    height = db.Column(db.String(20))
+    temperature = db.Column(db.String(20))
+    respiratory_rate = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 # ✅ Updated Reports Table
 class Report(db.Model):
@@ -104,6 +120,7 @@ def generate_unique_id():
     if Patient.query.filter_by(unique_id=uid).first():
         return generate_unique_id()
     return uid
+
 
 # ✅ Register Patient
 @app.route("/register", methods=["POST"])
@@ -275,8 +292,93 @@ def get_billing(unique_id):
     return jsonify(data), 200
 
 
+# ✅ Get All Appointments (for nurse)
+@app.route("/get_all_appointments", methods=["GET"])
+def get_all_appointments():
+    appointments = Appointment.query.order_by(Appointment.created_at.desc()).all()
+    data = [
+        {
+            "unique_id": a.unique_id,
+            "name": a.name,
+            "age": a.age,
+            "sex": a.sex,
+            "phone": a.phone,
+            "aadhaar": a.aadhaar,
+            "city": a.city,
+            "state": a.state,
+            "address": a.address,
+            "reason": a.reason,
+            "date": a.created_at.strftime("%Y-%m-%d %H:%M"),
+        }
+        for a in appointments
+    ]
+    return jsonify(data), 200
+
+
+# ✅ Get All Emergency Cases (for nurse)
+@app.route("/get_all_emergencies", methods=["GET"])
+def get_all_emergencies():
+    emergencies = EmergencyCase.query.order_by(EmergencyCase.created_at.desc()).all()
+    data = [
+        {
+            "unique_id": e.unique_id,
+            "name": e.name,
+            "age": e.age,
+            "sex": e.sex,
+            "phone": e.phone,
+            "aadhaar": e.aadhaar,
+            "city": e.city,
+            "state": e.state,
+            "address": e.address,
+            "emergency_type": e.emergency_type,
+            "other_contact": e.other_contact,
+            "immediate_treatment": e.immediate_treatment,
+            "date": e.created_at.strftime("%Y-%m-%d %H:%M"),
+        }
+        for e in emergencies
+    ]
+    return jsonify(data), 200
+ 
+
+# ✅ Update Medical Data for Appointments
+@app.route("/update_appointment_vitals", methods=["PUT"])
+def update_appointment_vitals():
+    data = request.json
+    appointment = Appointment.query.filter_by(unique_id=data["unique_id"]).first()
+    if not appointment:
+        return jsonify({"error": "Appointment not found"}), 404
+
+    appointment.blood_pressure = data.get("blood_pressure")
+    appointment.pulse_rate = data.get("pulse_rate")
+    appointment.weight = data.get("weight")
+    appointment.height = data.get("height")
+    appointment.temperature = data.get("temperature")
+    appointment.respiratory_rate = data.get("respiratory_rate")
+    db.session.commit()
+    return jsonify({"message": "✅ Appointment vitals updated successfully"}), 200
+
+
+# ✅ Update Medical Data for Emergency Cases
+@app.route("/update_emergency_vitals", methods=["PUT"])
+def update_emergency_vitals():
+    data = request.json
+    emergency = EmergencyCase.query.filter_by(unique_id=data["unique_id"]).first()
+    if not emergency:
+        return jsonify({"error": "Emergency case not found"}), 404
+
+    emergency.blood_pressure = data.get("blood_pressure")
+    emergency.pulse_rate = data.get("pulse_rate")
+    emergency.weight = data.get("weight")
+    emergency.height = data.get("height")
+    emergency.temperature = data.get("temperature")
+    emergency.respiratory_rate = data.get("respiratory_rate")
+    db.session.commit()
+    return jsonify({"message": "✅ Emergency vitals updated successfully"}), 200
+
+
+
 if __name__ == '__main__':
-   # with app.app_context():
-      #  db.drop_all() 
-        #db.create_all()
+    with app.app_context():
+        #db.drop_all() 
+        db.create_all()
     app.run(debug=True)
