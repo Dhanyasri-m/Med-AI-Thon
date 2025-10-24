@@ -16,8 +16,8 @@ const Dashboard = () => {
   };
 
   const cards = [
-    { title: "Emergency Form", path: "/emergency", color: "danger" },
     { title: "Appointments", path: "/appointments", color: "success" },
+    { title: "Emergency Form", path: "/emergency", color: "danger" },
     { title: "Reports", path: "/reports", color: "warning" },
     { title: "Pharmacy", path: "/pharmacy", color: "info" },
     { title: "Billing", path: "/billing", color: "secondary" },
