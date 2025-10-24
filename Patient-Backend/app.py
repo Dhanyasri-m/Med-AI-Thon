@@ -88,7 +88,4 @@ def login():
     return jsonify({"error": "Invalid phone number or password"}), 401
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.drop_all()   # clears all old mismatched tables
-        db.create_all()
     app.run(debug=True)

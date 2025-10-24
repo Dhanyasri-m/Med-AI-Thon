@@ -12,7 +12,7 @@ const Login = () => {
       alert(`${res.data.message}\nWelcome ${res.data.name} (${res.data.unique_id})`);
       localStorage.setItem("patientPhone", res.data.phone);
       localStorage.setItem("uniqueId", res.data.unique_id);
-      window.location.href = "/patient-details";
+      window.location.href = "/dashboard";
     } catch (err) {
       alert(err.response?.data?.error || "Login failed");
     }
