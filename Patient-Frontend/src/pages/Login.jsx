@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Login = () => {
   const [phone, setPhone] = useState("");
@@ -17,35 +18,67 @@ const Login = () => {
     }
   };
 
+  const cardStyle = {
+    width: "400px",
+    padding: "30px",
+    borderRadius: "15px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+    background: "white",
+  };
+
+  const containerStyle = {
+    height: "100vh",
+    background: "linear-gradient(135deg, #c3cfe2, #c3e8e2)",
+  };
+
+  const inputStyle = {
+    borderRadius: "8px",
+    marginBottom: "12px",
+    padding: "10px",
+    fontSize: "15px",
+  };
+
+  const btnStyle = {
+    borderRadius: "8px",
+    fontSize: "16px",
+    padding: "10px",
+    fontWeight: "600",
+  };
+
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-[400px]">
-        <h2 className="text-2xl font-bold text-center mb-6">🔑 Patient Login</h2>
+    <div className="d-flex justify-content-center align-items-center" style={containerStyle}>
+      <div style={cardStyle}>
+        <h3 className="text-center mb-4 fw-bold text-primary">
+          🔑 Patient Login
+        </h3>
 
         <input
           type="text"
           placeholder="Phone Number"
-          className="border rounded-md w-full mb-3 p-2"
+          className="form-control"
+          style={inputStyle}
           onChange={(e) => setPhone(e.target.value)}
         />
 
         <input
           type="password"
           placeholder="Password"
-          className="border rounded-md w-full mb-3 p-2"
+          className="form-control"
+          style={inputStyle}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           onClick={handleLogin}
-          className="bg-blue-500 hover:bg-blue-600 text-white w-full py-2 rounded"
+          className="btn btn-primary w-100 mt-2"
+          style={btnStyle}
         >
           Login
         </button>
 
-        <p className="mt-3 text-center">
+        <p className="text-center mt-3">
           Don’t have an account?{" "}
-          <a href="/register" className="text-blue-600 hover:underline">
+          <a href="/register" className="text-decoration-none fw-semibold text-success">
             Register
           </a>
         </p>

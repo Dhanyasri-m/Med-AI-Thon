@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -24,10 +25,39 @@ const Register = () => {
     }
   };
 
+  const cardStyle = {
+    width: "480px",
+    padding: "30px",
+    borderRadius: "15px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+    background: "white",
+  };
+
+  const containerStyle = {
+    height: "100vh",
+    background: "linear-gradient(135deg, #a8edea, #fed6e3)",
+  };
+
+  const inputStyle = {
+    borderRadius: "8px",
+    marginBottom: "12px",
+    padding: "10px",
+    fontSize: "15px",
+  };
+
+  const btnStyle = {
+    borderRadius: "8px",
+    fontSize: "16px",
+    padding: "10px",
+    fontWeight: "600",
+  };
+
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-[450px]">
-        <h2 className="text-2xl font-bold text-center mb-6">🩺 Patient Registration</h2>
+    <div className="d-flex justify-content-center align-items-center" style={containerStyle}>
+      <div style={cardStyle}>
+        <h3 className="text-center mb-4 fw-bold text-primary">
+          🩺 Patient Registration
+        </h3>
 
         {[
           { key: "name", label: "Full Name" },
@@ -44,22 +74,24 @@ const Register = () => {
             key={field.key}
             type={field.key === "password" ? "password" : "text"}
             placeholder={field.label}
+            className="form-control"
+            style={inputStyle}
             value={form[field.key]}
             onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-            className="border rounded-md w-full mb-3 p-2"
           />
         ))}
 
         <button
           onClick={handleRegister}
-          className="bg-green-500 hover:bg-green-600 text-white w-full py-2 rounded"
+          className="btn btn-success w-100 mt-2"
+          style={btnStyle}
         >
           Register
         </button>
 
-        <p className="mt-3 text-center">
+        <p className="text-center mt-3">
           Already have an account?{" "}
-          <a href="/" className="text-blue-600 hover:underline">
+          <a href="/" className="text-decoration-none fw-semibold text-primary">
             Login
           </a>
         </p>
