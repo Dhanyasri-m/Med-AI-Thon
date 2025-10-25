@@ -28,7 +28,6 @@ class Patient(db.Model):
     address = db.Column(db.String(200), nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
-# ✅ Appointment Model (linked by unique_id)
 class Appointment(db.Model):
     __tablename__ = 'appointments'
     id = db.Column(db.Integer, primary_key=True)
@@ -42,17 +41,17 @@ class Appointment(db.Model):
     state = db.Column(db.String(50))
     address = db.Column(db.String(200))
     reason = db.Column(db.String(250))
-    # 🩺 Nurse Medical Fields
+    # Nurse Medical Fields
     blood_pressure = db.Column(db.String(20))
     pulse_rate = db.Column(db.String(20))
     weight = db.Column(db.String(20))
     height = db.Column(db.String(20))
     temperature = db.Column(db.String(20))
     respiratory_rate = db.Column(db.String(20))
+    appointment_time = db.Column(db.DateTime)  # ✅ NEW
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-# ✅ Emergency Case Table
 class EmergencyCase(db.Model):
     __tablename__ = 'emergency_cases'
     id = db.Column(db.Integer, primary_key=True)
@@ -68,15 +67,15 @@ class EmergencyCase(db.Model):
     emergency_type = db.Column(db.String(100))
     other_contact = db.Column(db.String(15))
     immediate_treatment = db.Column(db.String(200))
-    # 🩺 Nurse Medical Fields
+    # Nurse Medical Fields
     blood_pressure = db.Column(db.String(20))
     pulse_rate = db.Column(db.String(20))
     weight = db.Column(db.String(20))
     height = db.Column(db.String(20))
     temperature = db.Column(db.String(20))
     respiratory_rate = db.Column(db.String(20))
+    treatment_time = db.Column(db.DateTime)  # ✅ NEW
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
 
 # ✅ Updated Reports Table
 class Report(db.Model):
@@ -375,10 +374,192 @@ def update_emergency_vitals():
     db.session.commit()
     return jsonify({"message": "✅ Emergency vitals updated successfully"}), 200
 
+# ✅ Update Appointment Time (Doctor)
+@app.route("/update_appointment_time", methods=["PUT"])
+def update_appointment_time():
+    data = request.json
+    appointment = Appointment.query.filter_by(unique_id=data["unique_id"]).first()
+    if not appointment:
+        return jsonify({"error": "Appointment not found"}), 404
+    appointment.appointment_time = data["appointment_time"]
+    db.session.commit()
+    return jsonify({"message": "✅ Appointment time fixed successfully"}), 200
+
+
+# ✅ Update Emergency Treatment Time (Doctor)
+@app.route("/update_emergency_time", methods=["PUT"])
+def update_emergency_time():
+    data = request.json
+    emergency = EmergencyCase.query.filter_by(unique_id=data["unique_id"]).first()
+    if not emergency:
+        return jsonify({"error": "Emergency case not found"}), 404
+    emergency.treatment_time = data["treatment_time"]
+    db.session.commit()
+    return jsonify({"message": "🚑 Emergency treatment time fixed successfully"}), 200
+
+
+@app.route("/get_all_appointments_doctor", methods=["GET"])
+def get_all_appointments_doctor():
+    appointments = Appointment.query.filter(
+        Appointment.blood_pressure.isnot(None)
+    ).order_by(Appointment.created_at.desc()).all()
+    data = [
+        {
+            "unique_id": a.unique_id,
+            "name": a.name,
+            "age": a.age,
+            "sex": a.sex,
+            "phone": a.phone,
+            "reason": a.reason,
+            "city": a.city,
+            "blood_pressure": a.blood_pressure,
+            "pulse_rate": a.pulse_rate,
+            "weight": a.weight,
+            "height": a.height,
+            "temperature": a.temperature,
+            "respiratory_rate": a.respiratory_rate,
+            "appointment_time": a.appointment_time.isoformat() if a.appointment_time else None,
+            "created_at": a.created_at.strftime("%Y-%m-%d %H:%M"),
+        }
+        for a in appointments
+    ]
+    return jsonify(data), 200
+
+
+@app.route("/get_all_emergencies_doctor", methods=["GET"])
+def get_all_emergencies_doctor():
+    emergencies = EmergencyCase.query.filter(
+        EmergencyCase.blood_pressure.isnot(None)
+    ).order_by(EmergencyCase.created_at.desc()).all()
+    data = [
+        {
+            "unique_id": e.unique_id,
+            "name": e.name,
+            "age": e.age,
+            "sex": e.sex,
+            "phone": e.phone,
+            "emergency_type": e.emergency_type,
+            "other_contact": e.other_contact,
+            "immediate_treatment": e.immediate_treatment,
+            "city": e.city,
+            "blood_pressure": e.blood_pressure,
+            "pulse_rate": e.pulse_rate,
+            "weight": e.weight,
+            "height": e.height,
+            "temperature": e.temperature,
+            "respiratory_rate": e.respiratory_rate,
+            "treatment_time": e.treatment_time.isoformat() if e.treatment_time else None,
+            "created_at": e.created_at.strftime("%Y-%m-%d %H:%M"),
+        }
+        for e in emergencies
+    ]
+    return jsonify(data), 200
+
+# ✅ Get Appointment Time for Patient
+@app.route("/get_patient_appointment/<unique_id>", methods=["GET"])
+def get_patient_appointment(unique_id):
+    appointment = Appointment.query.filter_by(unique_id=unique_id).first()
+    if not appointment:
+        return jsonify({"found": False}), 200  # clear flag for frontend
+    return jsonify({
+        "found": True,
+        "unique_id": appointment.unique_id,
+        "reason": appointment.reason,
+        "city": appointment.city,
+        "appointment_time": appointment.appointment_time.isoformat() if appointment.appointment_time else None
+    }), 200
+
+
+# ✅ Get Emergency Treatment Time for Patient
+@app.route("/get_patient_emergency/<unique_id>", methods=["GET"])
+def get_patient_emergency(unique_id):
+    emergency = EmergencyCase.query.filter_by(unique_id=unique_id).first()
+    if not emergency:
+        return jsonify({"found": False}), 200
+    return jsonify({
+        "found": True,
+        "unique_id": emergency.unique_id,
+        "emergency_type": emergency.emergency_type,
+        "immediate_treatment": emergency.immediate_treatment,
+        "treatment_time": emergency.treatment_time.isoformat() if emergency.treatment_time else None
+    }), 200
+
+
+# ✅ Doctor adds prescription, report, billing & next appointment
+@app.route("/add_doctor_update", methods=["POST"])
+def add_doctor_update():
+    data = request.json
+    uid = data.get("unique_id")
+    appointment = Appointment.query.filter_by(unique_id=uid).first()
+
+    if not appointment:
+        return jsonify({"error": "Appointment not found"}), 404
+
+    # ----------------------------
+    # 🧾 1️⃣ Save Lab Report / Diagnosis
+    # ----------------------------
+    new_report = Report(
+        unique_id=uid,
+        report_title="Consultation Summary / Lab Report",
+        diagnosis=data.get("description", "N/A"),
+        doctor_name="Dr. AI System",
+        file_url=data.get("report_url", ""),
+        date=datetime.utcnow()
+    )
+    db.session.add(new_report)
+
+    # ----------------------------
+    # 💊 2️⃣ Save Prescription (Pharmacy)
+    # ----------------------------
+    if data.get("prescription"):
+        prescription_text = data.get("prescription").strip()
+        if prescription_text:
+            new_pharma = Pharmacy(
+                unique_id=uid,
+                medicine_name=prescription_text,
+                dosage="As prescribed",
+                frequency="Daily",
+                duration="5 days",
+                prescribed_by="Dr. AI System",
+                date=datetime.utcnow()
+            )
+            db.session.add(new_pharma)
+
+    # ----------------------------
+    # 💰 3️⃣ Save Billing
+    # ----------------------------
+    if data.get("billing_amount"):
+        try:
+            amount = float(data.get("billing_amount"))
+        except:
+            amount = 0.0
+
+        new_bill = Billing(
+            unique_id=uid,
+            total_amount=amount,
+            payment_status="Pending",
+            billing_date=datetime.utcnow(),
+            remarks=data.get("billing_remarks", "")
+        )
+        db.session.add(new_bill)
+
+    # ----------------------------
+    # 📅 4️⃣ Update Appointment Next Visit
+    # ----------------------------
+    if data.get("next_appointment"):
+        try:
+            appointment.appointment_time = datetime.fromisoformat(
+                data["next_appointment"]
+            )
+        except:
+            pass
+
+    db.session.commit()
+    return jsonify({"message": "✅ Doctor update saved to all linked tables"}), 200
 
 
 if __name__ == '__main__':
     with app.app_context():
-        #db.drop_all() 
+        db.drop_all() 
         db.create_all()
     app.run(debug=True)

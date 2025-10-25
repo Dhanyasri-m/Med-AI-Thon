@@ -21,6 +21,7 @@ const Dashboard = () => {
     { title: "Reports", path: "/reports", color: "warning" },
     { title: "Pharmacy", path: "/pharmacy", color: "info" },
     { title: "Billing", path: "/billing", color: "secondary" },
+    { title: "Date & Time", path: "/date-and-time", color: "primary" }, // ✅ NEW
   ];
 
   return (

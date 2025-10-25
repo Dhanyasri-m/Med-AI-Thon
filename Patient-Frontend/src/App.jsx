@@ -2,13 +2,13 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Appointments from "./pages/Appointments";
 import EmergencyForm from "./pages/EmergencyForm";
 import Reports from "./pages/Reports";
 import Pharmacy from "./pages/Pharmacy";
 import Billing from "./pages/Billing";
+import DateAndTime from "./pages/DateAndTime"; // ✅ added
 
 function App() {
   return (
@@ -73,6 +73,17 @@ function App() {
             <>
               <Navbar />
               <Billing />
+            </>
+          }
+        />
+
+        {/* ✅ NEW Date & Time Route */}
+        <Route
+          path="/date-and-time"
+          element={
+            <>
+              <Navbar />
+              <DateAndTime />
             </>
           }
         />
